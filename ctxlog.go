@@ -2,18 +2,18 @@ package ctxlog
 
 import (
 	"context"
-	"github.com/Sirupsen/logrus"
+	"github.com/apex/log"
 )
 
 const LogFieldsContextKey = "log_fields"
 
-func GetContextualLogger(context context.Context, logger logrus.FieldLogger) logrus.FieldLogger {
+func GetContextualLogger(context context.Context, logger log.Interface) log.Interface {
 	ctxValue := context.Value(LogFieldsContextKey)
 	if ctxValue == nil {
 		return logger
 	}
 
-	ctxFields, ok := ctxValue.(logrus.Fields)
+	ctxFields, ok := ctxValue.(log.Fields)
 	if !ok {
 		return logger
 	}
@@ -21,16 +21,16 @@ func GetContextualLogger(context context.Context, logger logrus.FieldLogger) log
 	return logger.WithFields(ctxFields)
 }
 
-func GetUpdatedLoggingContext(ctx context.Context, fields logrus.Fields) context.Context {
+func GetUpdatedLoggingContext(ctx context.Context, fields log.Fields) context.Context {
 	if len(fields) < 1 {
 		return ctx
 	}
 
-	newFields := make(logrus.Fields)
+	newFields := make(log.Fields)
 
 	ctxValue := ctx.Value(LogFieldsContextKey)
 	if ctxValue != nil {
-		if currentFields, ok := ctxValue.(logrus.Fields); ok {
+		if currentFields, ok := ctxValue.(log.Fields); ok {
 			for name, value := range currentFields {
 				newFields[name] = value
 			}
@@ -43,4 +43,3 @@ func GetUpdatedLoggingContext(ctx context.Context, fields logrus.Fields) context
 
 	return context.WithValue(ctx, LogFieldsContextKey, newFields)
 }
-

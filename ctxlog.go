@@ -11,6 +11,10 @@ const logFieldsContextKey = "log_fields"
 // instance with fields if they are stored in the context returning the extended logger.
 // If context contains no fields, the logger instance is returned unmodified.
 func GetContextualLogger(context context.Context, logger log.Interface) log.Interface {
+    if logger == nil {
+        logger = log.Log
+    }
+
 	ctxValue := context.Value(logFieldsContextKey)
 	if ctxValue == nil {
 		return logger
@@ -43,6 +47,10 @@ func GetUpdatedLoggingContext(ctx context.Context, logger log.Interface, fields 
 	for name, value := range fields {
 		newFields[name] = value
 	}
+
+    if logger == nil {
+        logger = log.Log
+    }
 
 	return context.WithValue(ctx, logFieldsContextKey, newFields), logger.WithFields(newFields)
 }
